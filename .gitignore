@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / experiment artifacts
+wandb/
+*.log
+
+# Datasets and outputs (image translation demo)
+image_translation_demo/data/*
+!image_translation_demo/data/.gitkeep
+image_translation_demo/results/*
+!image_translation_demo/results/.gitkeep
+
+# Generated plot snapshots (synthetic)
+synthetic/synth_plot_*.pkl
+
+# Checkpoints / large binaries
+*.pt
+*.pth
+*.ckpt

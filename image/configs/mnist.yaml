@@ -1,0 +1,80 @@
+# One-sided training: GAN + Paired supervision + Jacobian L1 regularization (Sparse Finite Difference)
+# Uses sparse finite difference proxy: || (f(x + e*z) - f(x)) / e ||_1
+
+num_conditionals: 1
+batch_size: 16
+lr: 0.0001
+lr_start_step: 1
+lr_decay: False
+change_lr_every: 10000
+beta1: 0.0
+beta2: 0.99
+epsilon: 1e-8
+weight_decay: 0.00001
+
+train_iters: 50_000
+num_workers: 2
+
+gen:
+  use_adain: False
+  w_hpf: False
+  num_downsample: 2
+
+gan_criterion: nsgan   # lsgan / nsgan / label_smooth
+recons_criterion: l1   # l1 / l2 / perceptual
+
+# Regularization Parameters
+dis_w: 1.0
+gen_w: 1.0
+recons_w: 1.0
+vgg_w: 0.0
+dis_all_w: 0.0
+r1_reg_w: 1.0
+use_additional_generator_samples: False
+uniform_discriminator_training: False
+
+# Paired supervision enabled
+paired_loss_w: 1.0
+paired_batch_size: 1
+paired_max_pairs: 1
+
+# Jacobian regularization using sparse finite difference (fd_l1)
+# This approximates L1 Jacobian norm using:
+#   || (f(x + e*z) - f(x)) / e ||_1
+# where z ~ Bernoulli(jacobian_probe_sparsity) creates sparse perturbation mask
+# and e ~ N(0, jacobian_sigma) is the perturbation magnitude
+jacobian_loss_w: 0.01      # weight for g_12 (domain 1->2) Jacobian regularization
+jacobian_loss_w_2: 0.01    # weight for g_21 (domain 2->1) Jacobian regularization (ignored in one-sided mode)
+jacobian_num_samples: 8   # number of random samples to average
+jacobian_norm_type: fd_l1  # 'l1', 'lp_jvp', 'l2', or 'fd_l1' (sparse finite diff)
+jacobian_probe_sparsity: 0.1  # probability for sparse mask (higher = more dims perturbed)
+jacobian_sigma: 0.01      # std dev for perturbation magnitude (small)
+jacobian_start_iter: 0    # iteration to start applying jacobian regularization (0 = from beginning)
+
+# One-sided training: only translate from domain1 -> domain2 (train g_12)
+one_sided: True
+
+checkpoint_path: ''
+model_path: results/models/
+sample_path: results/samples/
+data_path: data/rotatedmnist
+domain1: mnist
+domain2: rotatedmnist
+
+console_log_steps: 10
+test_sample_steps: 2000
+save_checkpoint_steps: 10_000
+
+new_size: 32
+network_type: fcn
+fcn_hidden_dim: 1024
+
+use_wandb: True
+run_name: 'mnist_demo'
+group_name: 'one_sided_experiments'
+
+horizontal_flip: True
+mislabel_fraction: 0.0
+use_ema: True
+adjust_class_imbalance: True
+
